@@ -1,0 +1,15 @@
+* no-emoji
+#+html: <p align="center"><img src="https://melpa.org/packages/no-emoji-badge.svg" /></p>
+
+[[./no-emoji.png]]
+
+Screenshot: Unicode character #x1F600, 😀
+
+** Quick start
+Run =M-x no-emoji-minor-mode= to replace all emoji with /:emoji-name:/
+
+You can customize =no-emoji= face to alter the appearance.
+
+You can adapt the codepoint ranges in =no-emoji-codepoint-ranges= to customize which codepoints will be replaced.
+
+This package sets =buffer-display-table= locally.
