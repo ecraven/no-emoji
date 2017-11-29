@@ -49,10 +49,10 @@ Set `no-emoji' as the face for each glyph."
         (let ((cp (+ (car range) i)))
           (let ((name (get-unicode-property-internal names cp)))
             (when name
-              (aset dt cp (coerce (mapcar
-                                   (lambda (c)
-                                     (make-glyph-code c 'no-emoji))
-                                   (string-to-list (concat ":" (replace-regexp-in-string " " "-" (downcase name)) ":"))) 'vector)))))))
+              (aset dt cp (vconcat (mapcar
+                                    (lambda (c)
+                                      (make-glyph-code c 'no-emoji))
+                                    (string-to-list (concat ":" (replace-regexp-in-string " " "-" (downcase name)) ":"))))))))))
     dt))
 
 (define-minor-mode no-emoji-minor-mode
