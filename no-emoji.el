@@ -3,7 +3,7 @@
 ;; Copyright (C) 2017 craven@gmx.net
 
 ;; Author: Peter <craven@gmx.net>
-;; URL: https://github.com/ecraven/no-emoji.el
+;; URL: https://github.com/ecraven/no-emoji
 ;; Package-Version: 20171129
 ;; Package-Requires: ((emacs "24"))
 ;; Version: 0.1
