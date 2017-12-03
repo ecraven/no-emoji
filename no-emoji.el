@@ -22,6 +22,9 @@
 ;;
 ;; You can adapt the codepoint ranges in `no-emoji-codepoint-ranges' to customize which codepoints will be replaced.
 ;;
+;; You can redefine `no-emoji-displayable-unicode-name' to change the way the display names are generated.
+;; Do this *before* enabling the minor mode.
+;;
 ;; This package sets buffer-display-table locally.
 ;;
 ;;; Code:
@@ -36,33 +39,47 @@
   :type '(alist :key-type character :value-type character)
   :group 'no-emoji)
 
-(defface no-emoji `((t (:foreground "medium slate blue"))) "Face used to highlight emoji replacement text.")
+(defface no-emoji `((t (:inherit dired-header))) "Face used to highlight emoji replacement text.")
 
-(defun no-emoji-create-display-table ()
-  "Create a display table mapping emojis to their names.
+(defun no-emoji-displayable-unicode-name (name)
+  "Convert NAME to the string that should be shown.
+
+E.g. convert spaces to -, surround with :."
+  (concat ":" (replace-regexp-in-string " " "-" (downcase name)) ":"))
+
+(defun no-emoji-update-display-table (fill-p)
+  "If FILL-P is true, enter the relevant glyphs into the buffer-local display-table.
+
+If it is false, remove them.
+
 Process every character defined by the ranges in `no-emoji-codepoint-ranges'.
 Set `no-emoji' as the face for each glyph."
-  (let ((dt (make-display-table))
-        (names (unicode-property-table-internal 'name)))
+  (unless buffer-display-table
+    (setq buffer-display-table (make-display-table)))
+  (let ((names (unicode-property-table-internal 'name)))
     (dolist (range no-emoji-codepoint-ranges)
       (dotimes (i (- (cdr range) (car range)))
-        (let ((cp (+ (car range) i)))
-          (let ((name (get-unicode-property-internal names cp)))
+        (let ((codepoint (+ (car range) i)))
+          (let ((name (get-unicode-property-internal names codepoint)))
             (when name
-              (aset dt cp (vconcat (mapcar
-                                    (lambda (c)
-                                      (make-glyph-code c 'no-emoji))
-                                    (string-to-list (concat ":" (replace-regexp-in-string " " "-" (downcase name)) ":"))))))))))
-    dt))
+              (aset buffer-display-table
+                    codepoint
+                    (if fill-p
+                        (vconcat (mapcar
+                                  (lambda (c)
+                                    (make-glyph-code c 'no-emoji))
+                                  (string-to-list (no-emoji-displayable-unicode-name name))))
+                      nil)))))))
+    buffer-display-table))
 
+;;;###autoload
 (define-minor-mode no-emoji-minor-mode
   "Show emoji as :emoji-name:
-See `no-emoji-codepoint-ranges'."
+
+Also see `no-emoji-codepoint-ranges' and `no-emoji-displayable-unicode-name'."
   :init-value nil
   :lighter " emoji"
-  (if no-emoji-minor-mode
-      (setq buffer-display-table (no-emoji-create-display-table))
-    (setq buffer-display-table nil)))
+  (no-emoji-update-display-table no-emoji-minor-mode))
 
 (provide 'no-emoji)
 ;;; no-emoji.el ends here
