@@ -1,10 +1,10 @@
-;;; no-emoji.el --- Show :emoji-name: instead of emoji characters -*-coding: utf-8 -*-
+;;; no-emoji.el --- Show :emoji-name: instead of emoji characters -*-coding: utf-8; lexical-binding: t; -*-
 
 ;; Copyright (C) 2017 craven@gmx.net
 
 ;; Author: Peter <craven@gmx.net>
 ;; URL: https://github.com/ecraven/no-emoji
-;; Package-Version: 20171129
+;; Package-Version: 20171205
 ;; Package-Requires: ((emacs "24"))
 ;; Version: 0.1
 ;; Keywords: extensions
@@ -36,10 +36,13 @@
 (defcustom no-emoji-codepoint-ranges
   '((#x1f000 . #x1f9ff))
   "A list of codepoint ranges (inclusive) that will be replaced."
-  :type '(alist :key-type character :value-type character)
+  :type '(alist :key-type (character :tag "First character")
+                :value-type (character :tag "Last character"))
   :group 'no-emoji)
 
-(defface no-emoji `((t (:inherit dired-header))) "Face used to highlight emoji replacement text.")
+(defface no-emoji `((t (:inherit dired-header)))
+  "Face used to highlight emoji replacement text."
+  :group 'no-emoji)
 
 (defun no-emoji-displayable-unicode-name (name)
   "Convert NAME to the string that should be shown.
