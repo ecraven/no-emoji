@@ -16,9 +16,11 @@
 
 ;;; Commentary:
 ;;
-;; Run M-x no-emoji-minor-mode to replace all emoji with :emoji-name:
+;; Run M-x no-emoji-minor-mode to replace all emoji with :emoji-name: in the current buffer.
 ;;
-;; You can customize `no-emoji' face to alter the appearance.
+;; Run M-x global-no-emoji-minor-mode to replace all emoji with :emoji-name: in all buffers.
+;;
+;; You can customize the `no-emoji' face to alter the appearance.
 ;;
 ;; You can adapt the codepoint ranges in `no-emoji-codepoint-ranges' to customize which codepoints will be replaced.
 ;;
@@ -50,22 +52,20 @@
 E.g. convert spaces to -, surround with :."
   (concat ":" (replace-regexp-in-string " " "-" (downcase name)) ":"))
 
-(defun no-emoji-update-display-table (fill-p)
+(defun no-emoji--update-display-table (dt fill-p)
   "If FILL-P is true, enter the relevant glyphs into the buffer-local display-table.
 
 If it is false, remove them.
 
 Process every character defined by the ranges in `no-emoji-codepoint-ranges'.
 Set `no-emoji' as the face for each glyph."
-  (unless buffer-display-table
-    (setq buffer-display-table (make-display-table)))
   (let ((names (unicode-property-table-internal 'name)))
     (dolist (range no-emoji-codepoint-ranges)
       (dotimes (i (- (cdr range) (car range)))
         (let ((codepoint (+ (car range) i)))
           (let ((name (get-unicode-property-internal names codepoint)))
             (when name
-              (aset buffer-display-table
+              (aset dt
                     codepoint
                     (if fill-p
                         (vconcat (mapcar
@@ -73,7 +73,7 @@ Set `no-emoji' as the face for each glyph."
                                     (make-glyph-code c 'no-emoji))
                                   (string-to-list (no-emoji-displayable-unicode-name name))))
                       nil)))))))
-    buffer-display-table))
+    dt))
 
 ;;;###autoload
 (define-minor-mode no-emoji-minor-mode
@@ -81,8 +81,26 @@ Set `no-emoji' as the face for each glyph."
 
 Also see `no-emoji-codepoint-ranges' and `no-emoji-displayable-unicode-name'."
   :init-value nil
-  :lighter " emoji"
-  (no-emoji-update-display-table no-emoji-minor-mode))
+  :lighter " no-emoji"
+  (progn
+    (when no-emoji-minor-mode
+        (unless buffer-display-table
+          (setq-local no-emoji--no-dt t)
+          (setq buffer-display-table (make-display-table))))
+    (no-emoji--update-display-table buffer-display-table no-emoji-minor-mode)
+    (when (and (not no-emoji-minor-mode)
+               no-emoji--no-dt)
+      (kill-local-variable 'buffer-display-table)
+      (kill-local-variable 'no-emoji--no-dt))))
+
+(define-minor-mode global-no-emoji-minor-mode
+  "Show emoji as :emoji-name: in every buffer.
+
+Also see `no-emoji-codepoint-ranges' and `no-emoji-displayable-unicode-name'."
+  :global t
+  :init-value nil
+  :lighter " global-no-emoji"
+  (no-emoji--update-display-table standard-display-table global-no-emoji-minor-mode))
 
 (provide 'no-emoji)
 ;;; no-emoji.el ends here
