@@ -81,7 +81,7 @@ Set `no-emoji' as the face for each glyph."
 
 Also see `no-emoji-codepoint-ranges' and `no-emoji-displayable-unicode-name'."
   :init-value nil
-  :lighter " no-emoji"
+  :lighter " nemo"
   (progn
     (when no-emoji-minor-mode
         (unless buffer-display-table
@@ -99,7 +99,7 @@ Also see `no-emoji-codepoint-ranges' and `no-emoji-displayable-unicode-name'."
 Also see `no-emoji-codepoint-ranges' and `no-emoji-displayable-unicode-name'."
   :global t
   :init-value nil
-  :lighter " global-no-emoji"
+  :lighter " *nemo"
   (no-emoji--update-display-table standard-display-table global-no-emoji-minor-mode))
 
 (provide 'no-emoji)
