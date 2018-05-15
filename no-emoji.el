@@ -1,12 +1,12 @@
 ;;; no-emoji.el --- Show :emoji-name: instead of emoji characters -*-coding: utf-8; lexical-binding: t; -*-
 
-;; Copyright (C) 2017 craven@gmx.net
+;; Copyright (C) 2018 craven@gmx.net
 
 ;; Author: Peter <craven@gmx.net>
 ;; URL: https://github.com/ecraven/no-emoji
-;; Package-Version: 20171205
+;; Package-Version: 20180515
 ;; Package-Requires: ((emacs "24"))
-;; Version: 0.1
+;; Version: 0.2
 ;; Keywords: extensions
 ;; Created: 2017-11-29
 
