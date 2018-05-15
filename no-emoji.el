@@ -59,21 +59,20 @@ If it is false, remove them.
 
 Process every character defined by the ranges in `no-emoji-codepoint-ranges'.
 Set `no-emoji' as the face for each glyph."
-  (let ((names (unicode-property-table-internal 'name)))
-    (dolist (range no-emoji-codepoint-ranges)
-      (dotimes (i (- (cdr range) (car range)))
-        (let ((codepoint (+ (car range) i)))
-          (let ((name (get-unicode-property-internal names codepoint)))
-            (when name
-              (aset dt
-                    codepoint
-                    (if fill-p
-                        (vconcat (mapcar
-                                  (lambda (c)
-                                    (make-glyph-code c 'no-emoji))
-                                  (string-to-list (no-emoji-displayable-unicode-name name))))
-                      nil)))))))
-    dt))
+  (dolist (range no-emoji-codepoint-ranges)
+    (dotimes (i (- (cdr range) (car range)))
+      (let ((codepoint (+ (car range) i)))
+        (let ((name (get-char-code-property codepoint 'name)))
+          (when name
+            (aset dt
+                  codepoint
+                  (if fill-p
+                      (vconcat (mapcar
+                                (lambda (c)
+                                  (make-glyph-code c 'no-emoji))
+                                (string-to-list (no-emoji-displayable-unicode-name name))))
+                    nil)))))))
+  dt)
 
 ;;;###autoload
 (define-minor-mode no-emoji-minor-mode
